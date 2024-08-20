@@ -12,4 +12,4 @@
 
 7.- Finalmente entre a la carpeta clonada desde un terminal y corrí make qemu.
 
-Pantallazos: 
+Finalmente se incluyen 3 pantallazos en el la carpeta raíz del repositorio mostrando xv6 funcionando.
