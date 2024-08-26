@@ -10,6 +10,14 @@
 
 6.- Descargue riscv GNU toolchain para linux siguiendo un tutorial.
 
-7.- Finalmente entre a la carpeta clonada desde un terminal y corrí make qemu.
+7.- Luego entre a la carpeta clonada desde un terminal y corrí make qemu.
 
-Finalmente se incluyen 3 pantallazos en el la carpeta raíz del repositorio mostrando xv6 funcionando.
+Finalmente se incluyen 3 pantallazos mostrando xv6 funcionando:
+Cat README:
+![](Comando_cat_README.png)
+
+ls:
+![](Comando_ls.png)
+
+Echo:
+![](Comando_echo.png)
