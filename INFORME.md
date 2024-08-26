@@ -13,6 +13,7 @@
 7.- Luego entre a la carpeta clonada desde un terminal y corrí make qemu.
 
 Finalmente se incluyen 3 pantallazos mostrando xv6 funcionando:
+
 Cat README:
 ![](Comando_cat_README.png)
 
