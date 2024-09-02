@@ -91,3 +91,30 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+uint64
+sys_getppid(void)
+{
+    struct proc *curproc = myproc();   // Get the current process
+    if (curproc->parent) {
+        return curproc->parent->pid;   // Return the parent's PID
+    }
+    return 0;  // Return 0 if no parent (e.g., for the init process)
+}
+uint64
+sys_getancestor(void)
+{
+  int n;
+  argint(0, &n);
+  struct proc *p = myproc();
+   if (n == 0) {
+        return p->pid;
+    }
+  for (int i = 0; i < n; i++) {
+        if (p->parent == 0) {
+            return -1; // Return -1 if there is no nth ancestor
+        }
+        p = p->parent; // Move to the parent process
+    }
+
+    return p->pid;
+}
