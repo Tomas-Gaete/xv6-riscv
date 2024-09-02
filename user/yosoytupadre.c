@@ -4,7 +4,7 @@
 
 
 int main(int argc, char *argv[]) {
-    //int ppid = getppid();
+    int ppid = getppid();
     if (argc < 2) {
         printf("Usage: getancestor <n>\n");
         exit(1);
@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
     int ancestor_2 = getancestor(2);
     int n = atoi(argv[1]);
     int ancestor_pid = getancestor(n);
-    //printf("Parent Process ID: %d\n", ppid);
+    printf("Padre del proceso obtenido por getppid: %d\n", ppid);
     printf("Proceso actual: %d\n", ancestor_0);
     printf("Padre del proceso: %d\n", ancestor_1);
     printf("Abuelo del proceso: %d\n", ancestor_2);
