@@ -118,3 +118,61 @@ sys_getancestor(void)
 
     return p->pid;
 }
+
+struct proc* findproc(int pid) {
+  struct proc *p;
+  
+  // Iterate over the process table
+  for(p = proc; p < &proc[NPROC]; p++) {
+    if(p->pid == pid) {
+      return p;  // Return the process if the PID matches
+    }
+  }
+  
+  return 0;  // Return 0 if no process with the given PID is found
+}
+
+uint64
+sys_setpriority(void) {
+    int pid, priority;
+
+    // Fetch the arguments using argint() (void version)
+    argint(0, &pid);       // Fetch PID
+    argint(1, &priority);  // Fetch priority
+
+    // Check if the PID and priority are valid
+    if (pid < 0 || priority < 0) { // You may want to define valid ranges for priority
+        return -1;  // Return -1 if either value is invalid
+    }
+
+    struct proc *p = findproc(pid);  // Find the process
+    if (p) {
+        p->priority = priority;  // Set the priority
+        return 0;  // Return 0 on success, as a uint64
+    }
+
+    return -1;  // Return -1 if the process was not found
+}
+
+
+uint64
+sys_getpriority(void) {
+    int pid;
+    
+    // Fetch the PID argument using argint() (void version)
+    argint(0, &pid);  // Call argint() to fetch the PID
+    
+    // You might want to add error checking here if necessary
+    if (pid < 0) {  // You can check if PID is valid
+        return -1;  // Return -1 if the PID is invalid
+    }
+
+    // Find the process with the specified PID
+    struct proc *p = findproc(pid);
+    if (p) {
+        return p->priority;  // Return the priority, as a uint64
+    }
+
+    return -1;  // Return -1 if the process is not found
+}
+

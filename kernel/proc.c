@@ -54,6 +54,7 @@ procinit(void)
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
+      //p->priority = 0;
       p->kstack = KSTACK((int) (p - proc));
   }
 }
@@ -169,6 +170,7 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  p->priority = 0;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -321,6 +323,7 @@ fork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   release(&np->lock);
+  np->priority = p->priority;  // Inherit priority from parent process
 
   return pid;
 }
