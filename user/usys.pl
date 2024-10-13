@@ -40,3 +40,5 @@ entry("getppid");
 entry("getancestor");
 entry("setpriority");
 entry("getpriority");
+entry("setboost");
+entry("getboost");

@@ -24,3 +24,5 @@
 #define SYS_getancestor 23
 #define SYS_setpriority 24
 #define SYS_getpriority 25
+#define SYS_setboost 26
+#define SYS_getboost 27

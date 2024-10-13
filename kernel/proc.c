@@ -54,7 +54,8 @@ procinit(void)
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
-      //p->priority = 0;
+      p->priority = 0;
+      p->boost = 1;
       p->kstack = KSTACK((int) (p - proc));
   }
 }

@@ -26,6 +26,8 @@ int getppid(void);
 int getancestor(int);
 int setpriority(int pid, int priority);
 int getpriority(int pid);
+int setboost(int pid, int boost);
+int getboost(int pid);
 
 // ulib.c
 int stat(const char*, struct stat*);

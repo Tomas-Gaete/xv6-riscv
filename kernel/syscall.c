@@ -105,6 +105,8 @@ extern uint64 sys_getppid(void);
 extern uint64 sys_getancestor(void);
 extern uint64 sys_setpriority(void);
 extern uint64 sys_getpriority(void);
+extern uint64 sys_setboost(void);
+extern uint64 sys_getboost(void);
 
 // An array mapping syscall numbers from syscall.h
 // to the function that handles the system call.
@@ -134,6 +136,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_getancestor] sys_getancestor,
 [SYS_setpriority] sys_setpriority,
 [SYS_getpriority] sys_getpriority,
+[SYS_setboost] sys_setboost,
+[SYS_getboost] sys_getboost,
 
 };
 
