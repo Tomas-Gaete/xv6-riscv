@@ -30,3 +30,5 @@ Cabe agregar que se realizaron algunos cambios pequeños en el proc.c para cambi
 ### Después se desarrolló el código en t2_test que muestra en un ambiente controlado el comportamiento que tendrían los procesos con priority y boost implementados.
 
 ### IMPORTANTE: para correr este programa de pruebas se creo el archivo en la carpeta user y se agregó esta en el área respectiva del makefile dentro de uprogs (línea 144 del archivo)
+
+### Finalmente se implementaron cambios en el scheduler de proc.c (desde línea 463) par que funcione con los boosts y priorities creados.
