@@ -27,7 +27,11 @@ void update_priorities() {
             }
             if(processes[i].priority >=9){
                 processes[i].boost = -1;
-                processes[i].priority += processes[i].boost ;  // Boost decreases priority
+                processes[i].priority += processes[i].boost ;  // Boost decreases priority value
+            }
+            if(processes[i].priority == 0){
+                processes[i].boost = 1;
+                processes[i].priority += processes[i].boost ;  // Boost increases priority value
             }
         }
     }
