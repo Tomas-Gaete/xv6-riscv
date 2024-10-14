@@ -460,6 +460,7 @@ scheduler(void)
     intr_on();
 
     int found = 0;
+    //int flag = 0;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
@@ -467,6 +468,7 @@ scheduler(void)
         // to release its lock and then reacquire it
         // before jumping back to us.
         p->state = RUNNING;
+        //p->priority;
         c->proc = p;
         swtch(&c->context, &p->context);
 
