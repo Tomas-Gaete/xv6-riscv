@@ -18,12 +18,15 @@ void update_priorities() {
     for (int i = 0; i < process_count; i++) {
         if (processes[i].state != 1) {  // If process is not a zombie
             int current_priority = getpriority();  // Get current priority
-            int boost = getboost();                // Get current boost
+            int boost = getboost();
+            // Get current boost
             if (current_priority <= 9) {
+                current_priority = getpriority();
                 current_priority += boost;
                 setpriority(current_priority);
             } 
             if (current_priority > 9){
+                current_priority = getpriority();
                     boost = -1;
                     setboost(boost);  
                     current_priority += boost;
@@ -32,6 +35,7 @@ void update_priorities() {
                     setpriority(current_priority);       // Set new priority
             }
             if (current_priority <=0){
+                current_priority = getpriority();
                 boost = 1;
                 setboost(boost);
                 current_priority += boost;

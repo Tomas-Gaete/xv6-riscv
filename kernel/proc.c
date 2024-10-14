@@ -125,7 +125,8 @@ allocproc(void)
 found:
   p->pid = allocpid();
   p->state = USED;
-
+  p->priority = 0;
+  p->boost = 1;
   // Allocate a trapframe page.
   if((p->trapframe = (struct trapframe *)kalloc()) == 0){
     freeproc(p);
@@ -325,13 +326,7 @@ fork(void)
   np->state = RUNNABLE;
   release(&np->lock);
   
-  acquire(&np->lock);
-  np->priority = 0;  // Inherit priority from parent process
-  release(&np->lock);
 
-  acquire(&np->lock);
-  np->boost = 1;
-  release(&np->lock);
   return pid;
 }
 
