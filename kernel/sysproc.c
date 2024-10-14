@@ -142,7 +142,7 @@ sys_setpriority(void) {
     if (pid < 0 || priority < 0) { // You may want to define valid ranges for priority
         return -1;  // Return -1 if either value is invalid
     }
-    struct proc *p = findproc(pid);  // Find the process
+    struct proc *p = getpid();  // Find the process
     if (p) {
         p->priority = priority;  // Set the priority
         return 0;  // Return 0 on success, as a uint64
@@ -157,7 +157,7 @@ sys_getpriority(void) {
         return -1;  // Return -1 if the PID is invalid
     }
     // Find the process with the specified PID
-    struct proc *p = findproc(pid);
+    struct proc *p = getpid();
     if (p) {
         return p->priority;  // Return the priority, as a uint64
     }
@@ -172,7 +172,7 @@ sys_setboost(void){
         return -1;  // Return -1 if the PID is invalid
     }
     // Find the process with the specified PID
-    struct proc *p = findproc(pid);
+    struct proc *p = getpid();
     if (p) {
         return p->boost;  // Return the priority, as a uint64
     }
@@ -187,7 +187,7 @@ sys_getboost(void){
         return -1;  // Return -1 if the PID is invalid
     }
     // Find the process with the specified PID
-    struct proc *p = findproc(pid);
+    struct proc *p = getpid();
     if (p) {
         return p->boost;  // Return the priority, as a uint64
     }
