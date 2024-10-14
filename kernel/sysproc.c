@@ -121,7 +121,6 @@ sys_getancestor(void)
 
 struct proc* findproc(int pid) {
   struct proc *p;
-  
   // Iterate over the process table
   for(p = proc; p < &proc[NPROC]; p++) {
     if(p->pid == pid) {
@@ -135,6 +134,7 @@ struct proc* findproc(int pid) {
 uint64
 sys_setpriority(void) {
     int pid, priority;
+    int cur_pid = sys_getpid();
     // Fetch the arguments using argint() 
     argint(0, &pid);       // Fetch PID
     argint(1, &priority);  // Fetch priority
@@ -142,7 +142,8 @@ sys_setpriority(void) {
     if (pid < 0 || priority < 0) { // You may want to define valid ranges for priority
         return -1;  // Return -1 if either value is invalid
     }
-    struct proc *p = getpid();  // Find the process
+
+    struct proc *p = findproc(cur_pid);  // Find the process
     if (p) {
         p->priority = priority;  // Set the priority
         return 0;  // Return 0 on success, as a uint64
@@ -152,12 +153,13 @@ sys_setpriority(void) {
 uint64
 sys_getpriority(void) {
     int pid;
+    int cur_pid = sys_getpid();
     argint(0, &pid);  // Call argint() to fetch the PID
     if (pid < 0) {  // You can check if PID is valid
         return -1;  // Return -1 if the PID is invalid
     }
     // Find the process with the specified PID
-    struct proc *p = getpid();
+    struct proc *p = findproc(cur_pid);
     if (p) {
         return p->priority;  // Return the priority, as a uint64
     }
@@ -167,12 +169,13 @@ sys_getpriority(void) {
 uint64
 sys_setboost(void){
    int pid;
+   int cur_pid = sys_getpid();
     argint(0, &pid);  // Call argint() to fetch the PID
     if (pid < 0) {  // You can check if PID is valid
         return -1;  // Return -1 if the PID is invalid
     }
     // Find the process with the specified PID
-    struct proc *p = getpid();
+    struct proc *p = findproc(cur_pid);
     if (p) {
         return p->boost;  // Return the priority, as a uint64
     }
@@ -182,12 +185,13 @@ sys_setboost(void){
 uint64
 sys_getboost(void){
   int pid;
+  int cur_pid = sys_getpid();
     argint(0, &pid);  // Call argint() to fetch the PID
     if (pid < 0) {  // You can check if PID is valid
         return -1;  // Return -1 if the PID is invalid
     }
     // Find the process with the specified PID
-    struct proc *p = getpid();
+    struct proc *p = findproc(cur_pid);
     if (p) {
         return p->boost;  // Return the priority, as a uint64
     }
