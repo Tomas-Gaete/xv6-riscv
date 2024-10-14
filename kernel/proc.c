@@ -460,22 +460,31 @@ scheduler(void)
     intr_on();
 
     int found = 0;
-    //int flag = 0;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
+            int flag = 0;
         // Switch to chosen process.  It is the process's job
         // to release its lock and then reacquire it
         // before jumping back to us.
-        p->state = RUNNING;
-        //p->priority;
-        c->proc = p;
-        swtch(&c->context, &p->context);
+        if ((p->priority <= 9) & (p->priority !=0)){
+          p->priority += p->boost;
+        }
+        if (p->priority > 9){
+          p->boost = -1;
+          p->priority += p->boost;
+        }
+        if (p->priority <= 0){
+          p->boost = 1;
+        }
+        if (p->priority <= flag){
+          c->proc = p;
+          flag =p->priority;
+          p->state = RUNNING;
+          swtch(&c->context, &p->context);
+          c->proc = 0;
+        }
 
-        // Process is done running for now.
-        // It should have changed its p->state before coming back.
-        c->proc = 0;
-        found = 1;
       }
       release(&p->lock);
     }

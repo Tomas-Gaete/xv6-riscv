@@ -23,7 +23,6 @@ void update_priorities() {
             if (current_priority <= 9) {
                 current_priority = getpriority();
                 current_priority += boost;
-                setpriority(current_priority);
             } 
             if (current_priority > 9){
                 current_priority = getpriority();
@@ -32,16 +31,14 @@ void update_priorities() {
                     current_priority += boost;
                     if (current_priority < 0) current_priority = 0;   // Ensure priority doesn't go below 0
                     setboost(boost);                // Set new boost value
-                    setpriority(current_priority);       // Set new priority
             }
             if (current_priority <=0){
                 current_priority = getpriority();
                 boost = 1;
                 setboost(boost);
                 current_priority += boost;
-                setpriority(current_priority);
             } 
-            setpriority(current_priority);       // Set new priority
+            setpriority(current_priority);       // Set new priority after any if condition
             printf("Process with PID %d now has priority %d\n", processes[i].pid, current_priority);
         }
     }
