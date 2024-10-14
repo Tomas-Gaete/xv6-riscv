@@ -54,8 +54,7 @@ procinit(void)
   for(p = proc; p < &proc[NPROC]; p++) {
       initlock(&p->lock, "proc");
       p->state = UNUSED;
-      p->priority = 0;
-      p->boost = 1;
+      
       p->kstack = KSTACK((int) (p - proc));
   }
 }
@@ -325,8 +324,14 @@ fork(void)
   acquire(&np->lock);
   np->state = RUNNABLE;
   release(&np->lock);
-  np->priority = p->priority;  // Inherit priority from parent process
+  
+  acquire(&np->lock);
+  np->priority = 0;  // Inherit priority from parent process
+  release(&np->lock);
 
+  acquire(&np->lock);
+  np->boost = 1;
+  release(&np->lock);
   return pid;
 }
 

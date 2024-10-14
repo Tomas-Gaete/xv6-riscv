@@ -18,32 +18,30 @@ int process_count = 0;
 void update_priorities() {
     for (int i = 0; i < process_count; i++) {
         if (processes[i].state != 1) {  // If process is not a zombie
-            int current_priority = getpriority(processes[i].pid); // Get current priority
-            int boost = getboost(processes[i].pid);               // Get current boost
+            int current_priority = getpriority();  // Get current priority
+            int boost = getboost();                // Get current boost
 
             if (current_priority < 9) {
-                current_priority += boost;  // Increase priority by boost
-            } else if (current_priority >= 9) {
+                current_priority += boost;
+                if (current_priority > 9) current_priority = 9;   // Cap priority at 9
+            } else {
                 boost = -1;
-                current_priority += boost;  // Boost decreases priority value
-                setboost(processes[i].pid, boost); // Set new boost value
-            } else if (current_priority == 0) {
-                boost = 1;
-                current_priority += boost;  // Boost increases priority value
-                setboost(processes[i].pid, boost); // Set new boost value
+                current_priority += boost;
+                if (current_priority < 0) current_priority = 0;   // Ensure priority doesn't go below 0
+                setboost(boost);                // Set new boost value
             }
 
-            setpriority(processes[i].pid, current_priority); // Set new priority
+            setpriority(current_priority);       // Set new priority
             printf("Process with PID %d now has priority %d\n", processes[i].pid, current_priority);
         }
     }
 }
 
+
 // Function to create a new process and manage priorities
 void create_process() {
     int pid = fork();  // Create a new process
     int time = 5;
-
     if (pid < 0) {
         // Error in creating the process
         printf("Error creating process");
@@ -56,8 +54,8 @@ void create_process() {
     } else {
         // Parent process
         processes[process_count].pid = pid;     // Store the new process's PID
-        setpriority(pid, 0);                // Set initial priority to 0
-        setboost(pid, 1);                   // Set initial boost to 1
+        setpriority(0);                // Set initial priority to 0
+        setboost(1);                   // Set initial boost to 1
         processes[process_count].state = 0;     // Mark the process as running
         process_count++;
 

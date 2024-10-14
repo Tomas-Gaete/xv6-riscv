@@ -24,10 +24,10 @@ int sleep(int);
 int uptime(void);
 int getppid(void);
 int getancestor(int);
-int setpriority(int pid, int priority);
-int getpriority(int pid);
-int setboost(int pid, int boost);
-int getboost(int pid);
+int setpriority(int priority);
+int getpriority(void);
+int setboost(int boost);
+int getboost(void);
 
 // ulib.c
 int stat(const char*, struct stat*);
