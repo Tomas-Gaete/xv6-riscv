@@ -135,20 +135,26 @@ uint64
 sys_setpriority(void) {
     int pid, priority;
     int cur_pid = sys_getpid();
+    argint(0, &pid);  // Call argint() to fetch the PID
+    if (pid < 0) {  // You can check if PID is valid
+        return -1;  // Return -1 if the PID is invalid
+    }
     // Fetch the arguments using argint() 
-    argint(0, &pid);       // Fetch PID
     argint(1, &priority);  // Fetch priority
-    // Check if the PID and priority are valid
-    if (pid < 0 || priority < 0) { // You may want to define valid ranges for priority
-        return -1;  // Return -1 if either value is invalid
-    }
+    struct proc *p = findproc(cur_pid);
+      if (priority< 9){
+      priority+= p->boost ;  // Increase priority by BOOST
+      }
+      if(priority>=9){
+          priority+= p->boost ;  // Boost decreases priority value
+      }
+      if(priority== 0){
+          priority+= p->boost ;  // Boost increases priority value
+      }
+      p->priority = priority;
 
-    struct proc *p = findproc(cur_pid);  // Find the process
-    if (p) {
-        p->priority = priority;  // Set the priority
-        return 0;  // Return 0 on success, as a uint64
-    }
-    return -1;  // Return -1 if the process was not found
+    // Return 0 on success
+    return 0; 
 }
 uint64
 sys_getpriority(void) {
@@ -169,18 +175,26 @@ sys_getpriority(void) {
 uint64
 sys_setboost(void){
    int pid;
+   int boost;
+   int priority;
    int cur_pid = sys_getpid();
-    argint(0, &pid);  // Call argint() to fetch the PID
-    if (pid < 0) {  // You can check if PID is valid
+  argint(0, &pid);  // Call argint() to fetch the PID
+  argint(1, &priority);
+  argint(2, &boost);  // Call argint() to fetch the PID
+   if (pid < 0) {  // You can check if PID is valid
         return -1;  // Return -1 if the PID is invalid
     }
-    // Find the process with the specified PID
-    struct proc *p = findproc(cur_pid);
-    if (p) {
-        return p->boost;  // Return the priority, as a uint64
+  struct proc *p = findproc(cur_pid);
+    if(p->priority >=9){
+        boost = -1;
     }
-
-    return -1;  // Return -1 if the process is not found
+    if(p->priority == 0){
+        boost = 1;
+    }
+    
+    p->boost= boost;
+    // Return 0 on success
+    return 0;      
 }
 uint64
 sys_getboost(void){

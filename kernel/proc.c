@@ -172,6 +172,7 @@ freeproc(struct proc *p)
   p->xstate = 0;
   p->state = UNUSED;
   p->priority = 0;
+  p->boost = 1;
 }
 
 // Create a user page table for a given process, with no user memory,

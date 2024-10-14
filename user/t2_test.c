@@ -1,45 +1,48 @@
-#include <stdio.h>
-#include <unistd.h>   // For fork(), getpid(), sleep()
-#include <sys/wait.h> // For wait()
-#include <stdlib.h>   // For exit()
+
+#include "kernel/types.h"
+#include "user.h"
+#include "syscall.h"
 
 #define MAX_PROCESSES 20   // Number of processes to create
-#define BOOST 1            // Boost value to add to the priority
 
-// Struct to hold process information
+// Process structure, maintaining only the zombie state in the test code
 struct process {
-    pid_t pid;      // Process ID
-    int priority;
-    int boost;   // Priority of the process
-    int state;      // 0 = running, 1 = zombie (dummy state for this example)
+    int pid;  // Process ID
+    int state;  // 0 = running, 1 = zombie (dummy state for this example)
 };
 
 struct process processes[MAX_PROCESSES];
 int process_count = 0;
 
-// Function to update priorities of all non-zombie processes
+// Function to update priorities of all non-zombie processes using system calls
 void update_priorities() {
     for (int i = 0; i < process_count; i++) {
         if (processes[i].state != 1) {  // If process is not a zombie
-            if (processes[i].priority < 9){
-            processes[i].priority += processes[i].boost ;  // Increase priority by BOOST
-            printf("Process with PID %d now has priority %d\n", processes[i].pid, processes[i].priority);
+            int current_priority = getpriority(processes[i].pid); // Get current priority
+            int boost = getboost(processes[i].pid);               // Get current boost
+
+            if (current_priority < 9) {
+                current_priority += boost;  // Increase priority by boost
+            } else if (current_priority >= 9) {
+                boost = -1;
+                current_priority += boost;  // Boost decreases priority value
+                setboost(processes[i].pid, boost); // Set new boost value
+            } else if (current_priority == 0) {
+                boost = 1;
+                current_priority += boost;  // Boost increases priority value
+                setboost(processes[i].pid, boost); // Set new boost value
             }
-            if(processes[i].priority >=9){
-                processes[i].boost = -1;
-                processes[i].priority += processes[i].boost ;  // Boost decreases priority value
-            }
-            if(processes[i].priority == 0){
-                processes[i].boost = 1;
-                processes[i].priority += processes[i].boost ;  // Boost increases priority value
-            }
+
+            setpriority(processes[i].pid, current_priority); // Set new priority
+            printf("Process with PID %d now has priority %d\n", processes[i].pid, current_priority);
         }
     }
 }
 
 // Function to create a new process and manage priorities
 void create_process() {
-    pid_t pid = fork();  // Create a new process
+    int pid = fork();  // Create a new process
+    int time = 5;
 
     if (pid < 0) {
         // Error in creating the process
@@ -53,15 +56,15 @@ void create_process() {
     } else {
         // Parent process
         processes[process_count].pid = pid;     // Store the new process's PID
-        processes[process_count].priority = 0;  // Set initial priority to 0
-        processes[process_count].boost = 1;     //initial boost    
+        setpriority(pid, 0);                // Set initial priority to 0
+        setboost(pid, 1);                   // Set initial boost to 1
         processes[process_count].state = 0;     // Mark the process as running
         process_count++;
 
         // Update priorities of all existing processes
         update_priorities();
         
-        wait(NULL);  // Wait for the child process to finish
+        wait(&time);  // Wait for the child process to finish
     }
 }
 
