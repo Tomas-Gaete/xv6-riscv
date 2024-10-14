@@ -1,4 +1,3 @@
-
 #include "kernel/types.h"
 #include "user.h"
 #include "syscall.h"
@@ -20,17 +19,24 @@ void update_priorities() {
         if (processes[i].state != 1) {  // If process is not a zombie
             int current_priority = getpriority();  // Get current priority
             int boost = getboost();                // Get current boost
-
-            if (current_priority < 9) {
+            if (current_priority <= 9) {
                 current_priority += boost;
-                if (current_priority > 9) current_priority = 9;   // Cap priority at 9
-            } else {
-                boost = -1;
-                current_priority += boost;
-                if (current_priority < 0) current_priority = 0;   // Ensure priority doesn't go below 0
-                setboost(boost);                // Set new boost value
+                setpriority(current_priority);
+            } 
+            if (current_priority > 9){
+                    boost = -1;
+                    setboost(boost);  
+                    current_priority += boost;
+                    if (current_priority < 0) current_priority = 0;   // Ensure priority doesn't go below 0
+                    setboost(boost);                // Set new boost value
+                    setpriority(current_priority);       // Set new priority
             }
-
+            if (current_priority <=0){
+                boost = 1;
+                setboost(boost);
+                current_priority += boost;
+                setpriority(current_priority);
+            } 
             setpriority(current_priority);       // Set new priority
             printf("Process with PID %d now has priority %d\n", processes[i].pid, current_priority);
         }
@@ -48,29 +54,27 @@ void create_process() {
         exit(1);
     } else if (pid == 0) {
         // Child process
-        printf("Running child process with PID %d\n", getpid());
+        printf("NEW CREATED PROCESS ID:%d AND priority %d\n", getpid(), getpriority());
         sleep(2);  // Simulate work by sleeping for 2 seconds
         exit(0);   // Exit the child process
     } else {
         // Parent process
         processes[process_count].pid = pid;     // Store the new process's PID
-        setpriority(0);                // Set initial priority to 0
-        setboost(1);                   // Set initial boost to 1
         processes[process_count].state = 0;     // Mark the process as running
         process_count++;
 
         // Update priorities of all existing processes
-        update_priorities();
         
         wait(&time);  // Wait for the child process to finish
+        update_priorities();
     }
 }
 
 int main() {
     // Loop to create the defined number of processes
     for (int i = 0; i < MAX_PROCESSES; i++) {
-        create_process();  // Create each process and apply priority logic
+        create_process();
+        // Create each process and apply priority logic
     }
-
     return 0;
 }

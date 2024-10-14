@@ -143,8 +143,6 @@ uint64
 sys_setboost(void) {
     int boost;
     argint(0, &boost);       // Fetch boost value
-
-
     struct proc *p = myproc();
     acquire(&p->lock);
     p->boost = boost;        // Set boost
