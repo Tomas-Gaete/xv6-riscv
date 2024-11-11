@@ -141,7 +141,8 @@ UPROGS=\
 	$U/_zombie\
 	$U/_yosoytupadre\
 	$U/_clear\
-
+	$U/_t3_test\
+	
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
 

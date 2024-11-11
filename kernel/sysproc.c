@@ -118,3 +118,27 @@ sys_getancestor(void)
 
     return p->pid;
 }
+extern int mprotect(void *addr, int len);
+extern int munprotect(void *addr, int len);
+uint64
+sys_mprotect(void){
+  uint64 addr;
+  int len;
+
+
+  argaddr(0, &addr);  // Tomamos la dirección y el largo
+  argint(1, &len);
+  return mprotect((void *)addr, len); //usamos la funcionalidad definida en vm.c para agregar protección
+}
+
+
+uint64
+sys_munprotect(void){
+  uint64 addr;
+  int len;
+
+
+  argaddr(0, &addr);  // Tomamos la dirección y el largo
+  argint(1, &len);
+  return munprotect((void *)addr, len);//usamos la funcionalidad definida en vm.c para quitar protección
+}

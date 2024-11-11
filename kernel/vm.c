@@ -5,6 +5,7 @@
 #include "riscv.h"
 #include "defs.h"
 #include "fs.h"
+#include "proc.h"
 
 /*
  * the kernel's page table.
@@ -449,3 +450,30 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+int mprotect(void *addr, int len) {
+    pagetable_t pagetable = myproc()->pagetable;
+    uint64 direction; //direction es un uint que corresponderá al address original 
+    pte_t *pte;
+    for (direction = PGROUNDDOWN((uint64)addr); direction < (uint64)addr + len * PGSIZE; direction += PGSIZE) {
+        pte = walk(pagetable, direction, 0); 
+        if (!pte || !(*pte & PTE_V)) {
+            return -1; 
+        }
+        *pte &= ~PTE_W; //Cambia el bit correspondiente a los permisos de escritura, quitándolos
+    }
+    return 0;
+}
+int munprotect(void *addr, int len) {
+    pagetable_t pagetable = myproc()->pagetable;
+    uint64 direction;  
+    pte_t *pte;
+    for (direction = PGROUNDDOWN((uint64)addr); direction < (uint64)addr + len * PGSIZE; direction += PGSIZE) {
+        pte = walk(pagetable, direction, 0);//permite acceder a los bits
+        if (!pte || !(*pte & PTE_V)) {
+            return -1;
+        }
+        *pte |= PTE_W; // Vuelve a agregar el bit de escritura, retornando los permisos
+    }
+    return 0;
+  }
+ 
