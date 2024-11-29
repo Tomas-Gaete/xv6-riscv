@@ -287,6 +287,8 @@ create(char *path, short type, short major, short minor)
     dp->nlink++;  // for ".."
     iupdate(dp);
   }
+  
+  ip->permissions = 3; // Set default permision to read and write
 
   iunlockput(dp);
 
@@ -316,6 +318,7 @@ sys_open(void)
 
   begin_op();
 
+//handles logic for openiong or creating a file
   if(omode & O_CREATE){
     ip = create(path, T_FILE, 0, 0);
     if(ip == 0){
@@ -328,13 +331,14 @@ sys_open(void)
       return -1;
     }
     ilock(ip);
+    //Handles case where it's a directory that isn't  in read only mode
     if(ip->type == T_DIR && omode != O_RDONLY){
       iunlockput(ip);
       end_op();
       return -1;
     }
   }
-
+  //Checks if it is a device and its major number is invalid
   if(ip->type == T_DEVICE && (ip->major < 0 || ip->major >= NDEV)){
     iunlockput(ip);
     end_op();
@@ -348,7 +352,7 @@ sys_open(void)
     end_op();
     return -1;
   }
-
+//Handles case where it is a device
   if(ip->type == T_DEVICE){
     f->type = FD_DEVICE;
     f->major = ip->major;
@@ -356,6 +360,33 @@ sys_open(void)
     f->type = FD_INODE;
     f->off = 0;
   }
+
+  //Added logic for permisions
+  //stops process if permision is 0
+  if(ip->permissions == 0){
+      iunlockput(ip);
+      end_op();
+      return -1;
+    }
+
+  if(ip->permissions == 1 && (omode & (O_WRONLY | O_RDWR))){ // stops process if file is read only and we are trying to write
+    iunlockput(ip);
+    end_op();
+    return -1;
+  }
+
+  if (ip->permissions == 2 && ((omode & (O_RDONLY | O_RDWR)))){ // stops process if file is write only and we are trying to read
+    iunlockput(ip);
+    end_op();
+    return -1;
+  }
+
+  if (ip->permissions == 5 && (omode & (O_RDWR | O_WRONLY))){ //stops process if file is immutable
+    iunlockput(ip);
+    end_op();
+    return -1;
+  }
+
   f->ip = ip;
   f->readable = !(omode & O_WRONLY);
   f->writable = (omode & O_WRONLY) || (omode & O_RDWR);
@@ -368,6 +399,36 @@ sys_open(void)
   end_op();
 
   return fd;
+}
+
+//chmod logic
+uint64
+sys_chmod(void){
+  char path[MAXPATH];
+  int mode;
+  struct inode *ip;
+  
+  argstr(0, path, MAXPATH);
+  argint(1, &mode);
+  
+  begin_op();
+  if((ip = namei(path)) == 0){
+    end_op();
+    return -1;
+  }
+  ilock(ip);
+  //if inmutable return -1
+  if(ip->permissions== 5){
+    iunlockput(ip);
+    end_op();
+    return -1;
+  }
+  
+  ip->permissions = mode;
+  iupdate(ip);
+  iunlockput(ip);
+  end_op();
+  return 0;
 }
 
 uint64
